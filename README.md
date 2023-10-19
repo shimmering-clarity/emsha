@@ -1,9 +1,9 @@
 libemsha
 ========
 
-[![image](https://travis-ci.org/kisom/libemsha.svg?branch=master)](https://travis-ci.org/kisom/libemsha)
+[![CircleCI](https://dl.circleci.com/status-badge/img/gh/shimmering-clarity/emsha/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/shimmering-clarity/emsha/tree/master)
 
-[![image](https://scan.coverity.com/projects/7318/badge.svg)](https://scan.coverity.com/projects/libemsha-52f2a5fd-e759-43c2-9073-cf6c2ed9abdb)
+[![image](https://scan.coverity.com/projects/29250/badge.svg)](https://scan.coverity.com/projects/shimmering-clarity-emsha)
 
 This library is an MIT-licensed HMAC-SHA-256 C++11 library designed for
 embedded systems. It is built following the JPL [Power of
