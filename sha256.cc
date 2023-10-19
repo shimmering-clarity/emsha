@@ -147,9 +147,9 @@ SHA256::reset()
 uint32_t
 SHA256::chunkToUint32(uint32_t offset)
 {
-	uint32_t chunk = 0;
+	uint32_t chunk = 0U;
 
-	for (uint32_t i = offset; i < offset+4; i++) {
+	for (uint32_t i = offset; i < offset+4U; i++) {
 		chunk <<= 8;
 		chunk += static_cast<uint32_t>(this->mb[i]);
 	}
@@ -161,9 +161,9 @@ SHA256::chunkToUint32(uint32_t offset)
 uint32_t
 SHA256::uint32ToChunk(uint32_t offset)
 {
-	uint32_t chunk = 0;
+	uint32_t chunk = 0U;
 
-	for (uint32_t i = offset; i < offset+4; i++) {
+	for (uint32_t i = offset; i < offset+4U; i++) {
 		chunk <<= 8;
 		chunk += static_cast<uint32_t>(this->mb[i]);
 	}
@@ -176,10 +176,10 @@ SHA256::uint32ToChunk(uint32_t offset)
 static void
 uint32ToChunkInPlace(uint32_t x, uint8_t *chunk)
 {
-	chunk[0] = (x & 0xff000000) >> 24;
-	chunk[1] = (x & 0x00ff0000) >> 16;
-	chunk[2] = (x & 0x0000ff00) >> 8;
-	chunk[3] = (x & 0x000000ff);
+	chunk[0] = static_cast<uint8_t>((x & 0xff000000u) >> 24);
+	chunk[1] = static_cast<uint8_t>((x & 0x00ff0000u) >> 16);
+	chunk[2] = static_cast<uint8_t>((x & 0x0000ff00U) >> 8);
+	chunk[3] = static_cast<uint8_t>(x & 0x000000ffU);
 }
 
 
@@ -188,26 +188,26 @@ void
 SHA256::updateMessageBlock()
 {
 	uint32_t w[64];
-	uint32_t i     = 0;
-	uint32_t chunk = 0;
-	uint32_t a     = 0;
-	uint32_t b     = 0;
-	uint32_t c     = 0;
-	uint32_t d     = 0;
-	uint32_t e     = 0;
-	uint32_t f     = 0;
-	uint32_t g     = 0;
-	uint32_t h     = 0;
+	uint32_t i     = 0U;
+	uint32_t chunk = 0U;
+	uint32_t a     = 0U;
+	uint32_t b     = 0U;
+	uint32_t c     = 0U;
+	uint32_t d     = 0U;
+	uint32_t e     = 0U;
+	uint32_t f     = 0U;
+	uint32_t g     = 0U;
+	uint32_t h     = 0U;
 
-	while (i < 16) {
+	while (i < 16U) {
 		w[i++] = this->chunkToUint32(chunk);
-		chunk += 4;
+		chunk += 4U;
 	}
-	this->mbi = 0;
+	this->mbi = 0U;
 
-	for (i = 16; i < 64; i++) {
-		w[i] = sha_sigma1(w[i - 2]) + w[i - 7] +
-		       sha_sigma0(w[i - 15]) + w[i - 16];
+	for (i = 16U; i < 64U; i++) {
+		w[i] = sha_sigma1(w[i - 2U]) + w[i - 7U] +
+		       sha_sigma0(w[i - 15U]) + w[i - 16U];
 	}
 
 	a = this->i_hash[0];
@@ -219,9 +219,9 @@ SHA256::updateMessageBlock()
 	g = this->i_hash[6];
 	h = this->i_hash[7];
 
-	for (i = 0; i < 64; i++) {
-		uint32_t t1 = 0;
-		uint32_t t2 = 0;
+	for (i = 0U; i < 64U; i++) {
+		uint32_t t1 = 0U;
+		uint32_t t2 = 0U;
 		t1 = h + sha_Sigma1(e) + sha_ch(e, f, g) + sha256K[i] + w[i];
 		t2 = sha_Sigma0(a) + sha_maj(a, b, c);
 		h  = g;
@@ -248,38 +248,44 @@ SHA256::updateMessageBlock()
 EMSHAResult
 SHA256::Update(const std::uint8_t *message, std::uint32_t messageLength)
 {
+	EMSHAResult res;
+
 	// Checking invariants:
 	// If the message length is zero, there's nothing to be done.
-	if (0 == messageLength) { return EMSHAResult::OK; }
+	if (messageLength == 0U) { res = EMSHAResult::OK; }
 
 	// The message passed in cannot be the null pointer if the
 	// message length is greater than 0.
-	if (message == nullptr) { return EMSHAResult::NullPointer; }
+	else if (message == nullptr) { res = EMSHAResult::NullPointer; }
 
 	// If the SHA256 object is in a bad state, don't proceed.
-	if (this->hStatus != EMSHAResult::OK) { return this->hStatus; }
+	else if (this->hStatus != EMSHAResult::OK) { res = this->hStatus; }
 
 	// If the hash has been finalised, don't proceed.
-	if (this->hComplete != static_cast<uint8_t>(0)) { return EMSHAResult::InvalidState; }
+	else if (this->hComplete != 0U) { res = EMSHAResult::InvalidState; }
+
 	// Invariants satisfied by here.
+	else {
+		for (uint32_t i = 0U; i < messageLength; i++) {
+			this->mb[this->mbi] = *(message + i);
+			mbi++;
 
-	for (uint32_t i = 0; i < messageLength; i++) {
-		this->mb[this->mbi] = *(message + i);
-		mbi++;
+			if (EMSHAResult::OK == this->addLength(8U)) {
+				if (SHA256_MB_SIZE == this->mbi) {
+					this->updateMessageBlock();
 
-		if (EMSHAResult::OK == this->addLength(8)) {
-			if (SHA256_MB_SIZE == this->mbi) {
-				this->updateMessageBlock();
-
-				// Assumption: following the message block
-				// write, the context should still be in a good
-				// state.
-				assert(EMSHAResult::OK == this->hStatus);
+					// Assumption: following the message block
+					// write, the context should still be in a good
+					// state.
+					assert(EMSHAResult::OK == this->hStatus);
+				}
 			}
 		}
+
+		res = this->hStatus;
 	}
 
-	return this->hStatus;
+	return res;
 }
 
 
@@ -289,18 +295,18 @@ SHA256::padMessage(uint8_t pc)
 	// Assumption: the context is not in a corrupted state.
 	assert(EMSHAResult::OK == this->hStatus);
 
-	if (this->mbi < (SHA256_MB_SIZE - 8)) {
+	if (this->mbi < (SHA256_MB_SIZE - 8U)) {
 		this->mb[this->mbi++] = pc;
 	} else {
 		bool pc_add = false;
 
-		if (this->mbi < SHA256_MB_SIZE - 1) {
+		if (this->mbi < SHA256_MB_SIZE - 1U) {
 			this->mb[this->mbi++] = pc;
 			pc_add = true;
 		}
 
 		while (this->mbi < SHA256_MB_SIZE) {
-			this->mb[this->mbi++] = 0;
+			this->mb[this->mbi++] = 0U;
 		}
 
 		this->updateMessageBlock();
@@ -313,28 +319,28 @@ SHA256::padMessage(uint8_t pc)
 		assert(EMSHAResult::OK == this->hStatus);
 	}
 
-	while (this->mbi < (SHA256_MB_SIZE - 8)) {
-		this->mb[this->mbi++] = 0;
+	while (this->mbi < (SHA256_MB_SIZE - 8U)) {
+		this->mb[this->mbi++] = 0U;
 	}
 
 	// lstart marks the starting point for the length packing.
-	uint32_t const lstart = SHA256_MB_SIZE - 8;
+	uint32_t const lstart = SHA256_MB_SIZE - 8U;
 
 	this->mb[lstart] = static_cast<uint8_t>(this->mlen >> 56);
-	this->mb[lstart + 1] =
-	    static_cast<uint8_t>((this->mlen & 0x00ff000000000000L) >> 48);
-	this->mb[lstart + 2] =
-	    static_cast<uint8_t>((this->mlen & 0x0000ff0000000000L) >> 40);
-	this->mb[lstart + 3] =
-	    static_cast<uint8_t>((this->mlen & 0x000000ff00000000L) >> 32);
-	this->mb[lstart + 4] =
-	    static_cast<uint8_t>((this->mlen & 0x00000000ff000000L) >> 24);
-	this->mb[lstart + 5] =
-	    static_cast<uint8_t>((this->mlen & 0x0000000000ff0000L) >> 16);
-	this->mb[lstart + 6] =
-	    static_cast<uint8_t>((this->mlen & 0x000000000000ff00L) >> 8);
-	this->mb[lstart + 7] =
-	    static_cast<uint8_t>(this->mlen & 0x00000000000000ffL);
+	this->mb[lstart + 1U] =
+	    static_cast<uint8_t>((this->mlen & 0x00ff000000000000U) >> 48);
+	this->mb[lstart + 2U] =
+	    static_cast<uint8_t>((this->mlen & 0x0000ff0000000000U) >> 40);
+	this->mb[lstart + 3U] =
+	    static_cast<uint8_t>((this->mlen & 0x000000ff00000000U) >> 32);
+	this->mb[lstart + 4U] =
+	    static_cast<uint8_t>((this->mlen & 0x00000000ff000000U) >> 24);
+	this->mb[lstart + 5U] =
+	    static_cast<uint8_t>((this->mlen & 0x0000000000ff0000U) >> 16);
+	this->mb[lstart + 6U] =
+	    static_cast<uint8_t>((this->mlen & 0x000000000000ff00U) >> 8);
+	this->mb[lstart + 7U] =
+	    static_cast<uint8_t>(this->mlen & 0x00000000000000ffUL);
 
 	this->updateMessageBlock();
 
@@ -347,69 +353,78 @@ SHA256::padMessage(uint8_t pc)
 EMSHAResult
 SHA256::Finalise(std::uint8_t *digest)
 {
+	EMSHAResult	res;
+
 	// Check invariants.
 	// The digest cannot be a null pointer; this library allocates
 	// no memory of its own.
-	if (nullptr == digest) { return EMSHAResult::NullPointer; }
+	if (digest == nullptr) { res = EMSHAResult::NullPointer; }
 
 	// If the SHA256 object is in a bad state, don't proceed.
-	if (EMSHAResult::OK != this->hStatus) { return this->hStatus; }
+	else if (this->hStatus != EMSHAResult::OK) { res = this->hStatus; }
 
 	// If the hash has been finalised, don't proceed.
-	if (0 != this->hComplete) { return EMSHAResult::InvalidState; }
+	else if (this->hComplete != 0U) { res = EMSHAResult::InvalidState; }
+
 	// Invariants satisfied by here.
+	else {
+		this->padMessage(0x80U);
 
-	this->padMessage(0x80);
+		// Assumption: padding the message block has not left the context in a
+		// corrupted state.
+		assert(EMSHAResult::OK == this->hStatus);
+		std::fill(this->mb.begin(), this->mb.end(), 0);
 
-	// Assumption: padding the message block has not left the context in a
-	// corrupted state.
-	assert(EMSHAResult::OK == this->hStatus);
-	std::fill(this->mb.begin(), this->mb.end(), 0);
+		this->hComplete = 1U;
+		this->mlen      = 0U;
 
-	this->hComplete = 1;
-	this->mlen      = 0;
+		uint32ToChunkInPlace(this->i_hash[0], digest);
+		uint32ToChunkInPlace(this->i_hash[1], digest + 4);
+		uint32ToChunkInPlace(this->i_hash[2], digest + 8);
+		uint32ToChunkInPlace(this->i_hash[3], digest + 12);
+		uint32ToChunkInPlace(this->i_hash[4], digest + 16);
+		uint32ToChunkInPlace(this->i_hash[5], digest + 20);
+		uint32ToChunkInPlace(this->i_hash[6], digest + 24);
+		uint32ToChunkInPlace(this->i_hash[7], digest + 28);
 
-	uint32ToChunkInPlace(this->i_hash[0], digest);
-	uint32ToChunkInPlace(this->i_hash[1], digest + 4);
-	uint32ToChunkInPlace(this->i_hash[2], digest + 8);
-	uint32ToChunkInPlace(this->i_hash[3], digest + 12);
-	uint32ToChunkInPlace(this->i_hash[4], digest + 16);
-	uint32ToChunkInPlace(this->i_hash[5], digest + 20);
-	uint32ToChunkInPlace(this->i_hash[6], digest + 24);
-	uint32ToChunkInPlace(this->i_hash[7], digest + 28);
+		res = EMSHAResult::OK;
+	}
 
-	return EMSHAResult::OK;
+	return res;
 }
 
 
 EMSHAResult
 SHA256::Result(std::uint8_t *digest)
 {
+	EMSHAResult res;
 	// Check invariants.
 
 	// The digest cannot be a null pointer; this library allocates
 	// no memory of its own.
-	if (nullptr == digest) { return EMSHAResult::NullPointer; }
+	if (nullptr == digest) { res = EMSHAResult::NullPointer; }
 
 	// If the SHA256 object is in a bad state, don't proceed.
-	if (EMSHAResult::OK != this->hStatus) { return this->hStatus; }
+	else if (EMSHAResult::OK != this->hStatus) { res = this->hStatus; }
 
 	// Invariants satisfied by here.
-
-	if (this->hComplete == 0U) {
-		return this->Finalise(digest);
+	else if (this->hComplete == 0U) {
+		res = this->Finalise(digest);
 	}
 
-	uint32ToChunkInPlace(this->i_hash[0], digest);
-	uint32ToChunkInPlace(this->i_hash[1], digest + 4);
-	uint32ToChunkInPlace(this->i_hash[2], digest + 8);
-	uint32ToChunkInPlace(this->i_hash[3], digest + 12);
-	uint32ToChunkInPlace(this->i_hash[4], digest + 16);
-	uint32ToChunkInPlace(this->i_hash[5], digest + 20);
-	uint32ToChunkInPlace(this->i_hash[6], digest + 24);
-	uint32ToChunkInPlace(this->i_hash[7], digest + 28);
+	else {
+		uint32ToChunkInPlace(this->i_hash[0], digest);
+		uint32ToChunkInPlace(this->i_hash[1], digest + 4);
+		uint32ToChunkInPlace(this->i_hash[2], digest + 8);
+		uint32ToChunkInPlace(this->i_hash[3], digest + 12);
+		uint32ToChunkInPlace(this->i_hash[4], digest + 16);
+		uint32ToChunkInPlace(this->i_hash[5], digest + 20);
+		uint32ToChunkInPlace(this->i_hash[6], digest + 24);
+		uint32ToChunkInPlace(this->i_hash[7], digest + 28);
+		res = EMSHAResult::OK;
+	}
 
-	return EMSHAResult::OK;
+	return res;
 }
 
 
