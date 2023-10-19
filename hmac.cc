@@ -39,50 +39,58 @@ namespace emsha {
 // These constants are used to keep track of the state of the HMAC.
 
 // HMAC is in a clean-slate state following a call to Reset().
-constexpr uint8_t HMAC_INIT = 0;
+constexpr uint8_t HMAC_INIT = 0U;
 
 // The ipad constants have been XOR'd into the key and written to the
 // SHA-256 context.
-constexpr uint8_t HMAC_IPAD = 1;
+constexpr uint8_t HMAC_IPAD = 1U;
 
 // The opad constants have been XOR'd into the key and written to the
 // SHA-256 context.
-constexpr uint8_t HMAC_OPAD = 2;
+constexpr uint8_t HMAC_OPAD = 2U;
 
 // HMAC has been finalised
-constexpr uint8_t HMAC_FIN = 3;
+constexpr uint8_t HMAC_FIN = 3U;
 
 // HMAC is in an invalid state.
-constexpr uint8_t HMAC_INVALID = 4;
+constexpr uint8_t HMAC_INVALID = 4U;
 
 
-static constexpr uint8_t ipad = 0x36;
-static constexpr uint8_t opad = 0x5c;
+static constexpr uint8_t ipad = 0x36U;
+static constexpr uint8_t opad = 0x5cU;
 
 
 HMAC::HMAC(const uint8_t *ik, uint32_t ikl)
-    : hstate(HMAC_INIT), k{0}, buf{0}
+    : hstate(HMAC_INIT), k{0U}, buf{0U}
 {
 	std::fill(this->k, this->k+HMAC_KEY_LENGTH, 0);
 
 	if (ikl < HMAC_KEY_LENGTH) {
-		for (uint32_t i = 0; i < ikl; i++) {
+		for (uint32_t i = 0U; i < ikl; i++) {
 			this->k[i] = ik[i];
 		}
 		while (ikl < HMAC_KEY_LENGTH) {
-			this->k[ikl++] = 0;
+			this->k[ikl++] = 0U;
 		}
 	} else if (ikl > HMAC_KEY_LENGTH) {
-		this->ctx.Update(ik, ikl);
-		this->ctx.Result(this->k);
-		this->ctx.Reset();
+		if (this->ctx.Update(ik, ikl) != EMSHAResult::OK) {
+			this->hstate = HMAC_INVALID;
+		} else if (this->ctx.Result(this->k) != EMSHAResult::OK) {
+			this->hstate = HMAC_INVALID;
+		} else if (this->ctx.Reset() != EMSHAResult::OK) {
+			this->hstate = HMAC_INVALID;
+		} else {
+			this->hstate = HMAC_INIT;
+		}
 	} else {
-		for (uint32_t i = 0; i < ikl; i++) {
+		for (uint32_t i = 0U; i < ikl; i++) {
 			this->k[i] = ik[i];
 		}
 	}
 
-	this->reset();
+	if (this->reset() != EMSHAResult::OK) {
+		this->hstate = HMAC_INVALID;
+	}
 }
 
 
@@ -91,7 +99,7 @@ HMAC::HMAC(const uint8_t *ik, uint32_t ikl)
  */
 HMAC::~HMAC()
 {
-	this->reset();
+	(void)this->reset();
 	std::fill(this->k, this->k + HMAC_KEY_LENGTH, 0);
 }
 

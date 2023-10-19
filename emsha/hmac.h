@@ -154,7 +154,7 @@ private:
 	uint8_t k[HMAC_KEY_LENGTH];
 	uint8_t	buf[SHA256_HASH_SIZE];
 
-	EMSHAResult reset();
+	EMSHAResult 		reset();
 	inline EMSHAResult	finalResult(uint8_t *d);
 };
 

@@ -405,7 +405,7 @@ SHA256::Result(std::uint8_t *digest)
 	if (nullptr == digest) { res = EMSHAResult::NullPointer; }
 
 	// If the SHA256 object is in a bad state, don't proceed.
-	else if (EMSHAResult::OK != this->hStatus) { res = this->hStatus; }
+	else if (this->hStatus != EMSHAResult::OK) { res = this->hStatus; }
 
 	// Invariants satisfied by here.
 	else if (this->hComplete == 0U) {
