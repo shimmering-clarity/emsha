@@ -54,37 +54,37 @@ namespace emsha {
 #endif
 
 /// SHA256_HASH_SIZE is the output length of SHA-256 in bytes.
-const std::uint32_t SHA256_HASH_SIZE = 32;
+const std::uint32_t SHA256_HASH_SIZE = 32U;
 
 
 /// \brief Describe the result of an EMSHA operation.
 ///
 /// The EMSHAResult type is used to indicate whether an operation
 /// succeeded, and if not, what the general fault type was.
-typedef enum class EMSHAResult : std::uint8_t {
+enum class EMSHAResult : std::uint8_t {
 	/// An unknown fault occurred. This is a serious bug in the
 	/// program.
-	Unknown = 0,
+	Unknown = 0U,
 
 	/// All operations have completed successfully so far.
-	OK = 1,
+	OK = 1U,
 
 	/// The self-test failed.
-	TestFailure = 2,
+	TestFailure = 2U,
 
 	/// A null pointer was passed in as a buffer where it shouldn't
 	/// have been.
-	NullPointer = 3,
+	NullPointer = 3U,
 
 	/// The Hash is in an invalid state.
-	InvalidState = 4,
+	InvalidState = 4U,
 
 	/// The input to SHA256::update is too large.
-	InputTooLong = 5,
+	InputTooLong = 5U,
 
 	/// The self tests have been disabled, but a self-test function
 	/// was called.
-	SelfTestDisabled = 6
+	SelfTestDisabled = 6U
 } ;
 
 

@@ -27,9 +27,9 @@
 #include <cstdint>
 #include <cstring>
 
-#include <emsha/emsha.h>
-#include <emsha/sha256.h>
-#include <emsha/internal.h>
+#include "emsha/emsha.h"
+#include "emsha/internal.h"
+#include "emsha/sha256.h"
 #include <algorithm>
 #include <iostream>
 

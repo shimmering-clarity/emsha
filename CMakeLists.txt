@@ -45,14 +45,14 @@ else ()
 endif ()
 
 ### Set up the build ###
-set(HEADERS 
-	emsha/emsha.h
-	emsha/sha256.h
-	emsha/hmac.h
-	emsha/internal.h)
-set(SOURCES emsha.cc sha256.cc hmac.cc)
+set(HEADERS
+        include/emsha/emsha.h
+        include/emsha/sha256.h
+        include/emsha/hmac.h
+        include/emsha/internal.h)
+set(SOURCES src/emsha.cc src/sha256.cc src/hmac.cc)
 
-include_directories(SYSTEM .)
+include_directories(include)
 
 ### Build products ###
 
@@ -60,14 +60,15 @@ add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
 
 ### TESTS ###
 
-set(TEST_SOURCES test_utils.cc)
+set(TEST_SOURCES test/test_utils.cc)
 macro(generate_test name)
-	add_executable(${name} ${name}.cc ${TEST_SOURCES} ${ARGN})
+	add_executable(${name} test/${name}.cc ${TEST_SOURCES} ${ARGN})
 	target_link_libraries(${name} ${PROJECT_NAME})
+	target_include_directories(${name} PRIVATE test)
 	add_test(${name} ${name})
 endmacro()
 
-generate_test(test_${PROJECT_NAME} test_${PROJECT_NAME}.cc)
+generate_test(test_${PROJECT_NAME})
 generate_test(test_hmac)
 generate_test(test_mem)
 generate_test(test_sha256)

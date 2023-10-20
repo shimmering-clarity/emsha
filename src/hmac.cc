@@ -28,9 +28,9 @@
 #include <cstdint>
 
 
-#include <emsha/emsha.h>
-#include <emsha/sha256.h>
-#include <emsha/hmac.h>
+#include "emsha/emsha.h"
+#include "emsha/hmac.h"
+#include "emsha/sha256.h"
 
 
 namespace emsha {

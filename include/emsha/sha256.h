@@ -33,8 +33,8 @@
 
 #include <cstdint>
 
-#include <emsha/emsha.h>
 #include <array>
+#include <emsha/emsha.h>
 
 
 namespace emsha {

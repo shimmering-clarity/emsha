@@ -25,8 +25,8 @@
 
 #include <iostream>
 
-#include <emsha/emsha.h>
-#include <emsha/hmac.h>
+#include "emsha/emsha.h"
+#include "emsha/hmac.h"
 
 #include "test_utils.h"
 

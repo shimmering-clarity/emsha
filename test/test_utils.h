@@ -30,9 +30,9 @@
 #include <cstdint>
 #include <string>
 
-#include <emsha/emsha.h>
-#include <emsha/sha256.h>
-#include <emsha/hmac.h>
+#include "emsha/emsha.h"
+#include "emsha/hmac.h"
+#include "emsha/sha256.h"
 
 
 // How many times should a test result be checked? The goal is to

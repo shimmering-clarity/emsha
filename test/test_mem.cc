@@ -35,9 +35,9 @@
 #include <cstdio>
 #include <iostream>
 
-#include <emsha/emsha.h>
-#include <emsha/sha256.h>
-#include <emsha/hmac.h>
+#include "emsha/emsha.h"
+#include "emsha/hmac.h"
+#include "emsha/sha256.h"
 
 
 // Number of test iterations.
