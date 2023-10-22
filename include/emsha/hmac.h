@@ -99,8 +99,8 @@ public:
 	/// \note Once #Finalise is called, the context cannot be
 	///       updated unless the context is reset.
 	///
-	/// \param digest A byte buffer that must be at least #HMAC.Size()
-	///          in length.
+	/// \param digest A byte buffer that must be at least
+	///        #Size() in length.
 	/// \return An EMSHAResult describing the result of this
 	///         method:
 	///
@@ -120,8 +120,8 @@ public:
 	/// `digest`, running #Finalise if needed. Once called, the
 	/// context cannot be updated until the context is reset.
 	///
-	/// \param digest A byte buffer that must be at least #HMAC.size()
-	///               in length.
+	/// \param digest A byte buffer that must be at least
+	///        #Size() in length.
 	/// \return An ::EMSHAResult describing the result of this
 	///         method:
 	///

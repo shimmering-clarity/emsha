@@ -1,4 +1,4 @@
-# emsha
+# emsha: EMbedded Secure HAshing 
 
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/shimmering-clarity/emsha/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/shimmering-clarity/emsha/tree/master)
 
@@ -38,6 +38,17 @@ There are two cache variables that might be useful:
   the `hexstring` function is disabled, this option has no effect.
 - `SET_EMSHA_NO_SELFTEST` disables the internal self-tests, which can
   reclaim some additional program space.
+
+### Synopsis
+
+The Hash pure virtual class defines a basic interface for programs:
+
+- Hash::Reset will clear an instance of a Hash class.
+- Hash::Update writes data into the Hash.
+- Hash::Finalize will finish the Hash function and write the results
+  out.
+
+There are two implementations provided for Hash: SHA256 and HMAC.
 
 ### Documentation
 
