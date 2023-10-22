@@ -1,15 +1,15 @@
 cmake_minimum_required(VERSION 3.22)
 project(emsha
-	VERSION 1.1.0
+	VERSION 1.1.1
 	LANGUAGES CXX 
 	DESCRIPTION "A compact HMAC-SHA-256 C++11 library.")
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_VERBOSE_MAKEFILES ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-set(EMSHA_NO_HEXSTRING OFF CACHE BOOL
+set(SET_EMSHA_NO_HEXSTRING OFF CACHE BOOL
 	"Don't include support for hex strings.")
-if (EMSHA_NO_HEXSTRING)
+if (SET_EMSHA_NO_HEXSTRING)
 	add_definitions(EMSHA_NO_HEXSTRING)
 endif ()
 set(SET_EMSHA_NO_HEXLUT OFF CACHE BOOL
@@ -17,6 +17,13 @@ set(SET_EMSHA_NO_HEXLUT OFF CACHE BOOL
 if (SET_EMSHA_NO_HEXLUT)
 	add_definitions("-DEMSHA_NO_HEXLUT")
 endif ()
+
+set(SET_EMSHA_NO_SELFTEST OFF CACHE BOOL
+	"Disable the internal self-tests.")
+if (SET_EMSHA_NO_SELFTEST)
+	add_definitions("-DEMSHA_NO_SELFTEST")
+endif ()
+
 
 include(CTest)
 enable_testing()
