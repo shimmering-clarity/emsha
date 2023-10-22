@@ -31,6 +31,12 @@ if (${DOXYGEN_FOUND})
 		${HEADER_FILES}
 		ALL
 		USE_STAMP_FILE)
+
+	add_custom_target(deploy-docs
+			COMMAND rsync --delete-after --progress -auvz ${CMAKE_CURRENT_BINARY_DIR}/html/* docs.shimmering-clarity.net:sites/cc/${PROJECT_NAME}/
+			DEPENDS emsha_docs
+	)
+
 	install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/html
 		${CMAKE_CURRENT_BINARY_DIR}/latex
 		DESTINATION share/doc/${PROJECT_NAME}/doxygen)
